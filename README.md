@@ -52,6 +52,4 @@ The API will be available at `http://localhost:3000`.
 - `POST /api/enrollments/:courseId`: Enroll in a course
 - `GET /api/enrollments`: Get enrolled courses for a user
 
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
+## Thank You
