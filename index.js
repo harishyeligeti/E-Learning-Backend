@@ -16,7 +16,7 @@ app.use(cors());
 
 
 // Routes
-app.get("/", (req,res)=>{res.send("welcome to e-learning")})
+app.get("/", (req,res)=>{res.send("welcome to e-learning  go through the documentation for api endpoints ")})
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
