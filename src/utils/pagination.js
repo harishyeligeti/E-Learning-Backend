@@ -1,4 +1,4 @@
-const pool = require('../config/database');
+const pool = require("../config/database");
 
 const getPaginationData = async (page, limit, tableName, filterCondition, filterValues) => {
   try {
@@ -13,39 +13,36 @@ const getPaginationData = async (page, limit, tableName, filterCondition, filter
     let totalPages, totalItems;
 
     if (metadataResult.rows.length > 0) {
+
       // Use existing pagination metadata
       const metadata = metadataResult.rows[0];
       totalPages = metadata.total_pages;
       totalItems = metadata.total_items;
     } else {
+
       // Calculate pagination metadata and store it
-      const totalRowsQuery = `SELECT COUNT(*) FROM ${tableName} ${filterCondition ? `WHERE ${filterCondition}` : ''}`;
+      const totalRowsQuery = `SELECT COUNT(*) FROM ${tableName} ${filterCondition ? `WHERE ${filterCondition}` : ""}`;
       const totalRowsResult = await pool.query(totalRowsQuery, filterValues);
       totalItems = parseInt(totalRowsResult.rows[0].count, 10);
-      totalPages = Math.ceil(totalItems / limit);
+      totalPages = parseInt(Math.ceil(totalItems / limit));
 
       const insertMetadataQuery = `
         INSERT INTO pagination_metadata
         (table_name, filter_condition, current_page, items_per_page, total_items, total_pages)
         VALUES ($1, $2, $3, $4, $5, $6)
       `;
-      const insertMetadataValues = [
-        tableName,
-        filterCondition,
-        page,
-        limit,
-        totalItems,
-        totalPages,
-      ];
+      const insertMetadataValues = [tableName, filterCondition, page, limit, totalItems, totalPages];
       await pool.query(insertMetadataQuery, insertMetadataValues);
     }
 
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
+    console.log(startIndex,endIndex,totalPages);
 
     return { startIndex, endIndex, totalPages };
   } catch (error) {
-    throw new Error('Error fetching pagination data');
+    console.log(error);
+    throw new Error("Error fetching pagination data");
   }
 };
 

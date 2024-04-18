@@ -4,7 +4,12 @@ const paginationUtil = require("../utils/pagination");
 // Get courses with filtering and pagination
 exports.getCourses = async (req, res) => {
   try {
-    const { page, limit, category, level } = req.query;
+    const { category, level } = req.query;
+
+    //show default page from 1 to 10
+    const page = req.query.page ? parseInt(req.query.page, 10 ): 1
+    const limit = req.query.limit ? parseInt(req.query.limit,10) : 10
+
     const filters = [];
     const values = [];
 
@@ -23,8 +28,7 @@ exports.getCourses = async (req, res) => {
     const { startIndex, endIndex, totalPages } = await paginationUtil.getPaginationData(page, limit, "courses", filterCondition, values);
 
     const courses = await pool.query(
-      `SELECT * FROM courses 
-       ${filterCondition ? `WHERE ${filterCondition}` : ""}
+      `SELECT * FROM courses ${filterCondition ? `WHERE ${filterCondition}` : ""}
        ORDER BY id ASC
        LIMIT $${filters.length + 1} OFFSET $${filters.length + 2}`,
       [...values, limit, startIndex]
@@ -36,6 +40,7 @@ exports.getCourses = async (req, res) => {
       currentPage: page,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -51,7 +56,7 @@ exports.createCourse = async (req, res) => {
 
     const { title, description, category, level } = req.body;
     const newCourse = await pool.query("INSERT INTO courses (title, description, category, level) VALUES ($1, $2, $3, $4) RETURNING *", [title, description, category, level]);
-    
+
     console.log("course created successfully");
     res.status(201).json(newCourse.rows[0]);
   } catch (error) {
